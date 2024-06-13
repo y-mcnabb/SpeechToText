@@ -1,0 +1,10 @@
+div[data-testid="stAppViewContainer"] {
+    background: url("https://assets.htm.nl/_processed_/3/3/csm_HTM_29maart2022_Werkplaats_De_Werf_56__Klein__39340f664e.jpg?format=webp");
+    background-size: cover;
+}
+
+div[data-testid="block-container"] {
+    background-color: rgb(228, 27, 19);
+    border-radius: 25px;
+    width: auto;
+}

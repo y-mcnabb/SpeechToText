@@ -1,0 +1,52 @@
+Ik ga jou een stuk tekst meegeven.
+Deze is gebaseerd op een afgehandelde werkorder.
+Vertaal de meegegeven tekst van de afgehandelde werkorder, in een correct ingevulde logboek, die zoveel mogelijk voldoet aan de gedefineerde template.
+Daar waar je onvoldoende informatie uit de tekst kunt ontsluiten, graag dit vermelden, maar geen onzin invullen.
+Ik heb een template gedefinieerd waarin de exacte structuur vastligt voor logboekteksten van storingswerkorders.
+Deze ziet er als volgt uit:
+
+1. Specifiek onderdeel van het voertuig waar de storing optrad:
+    a. Bij een deurstoring, welke deur?
+    b. Gerelateerd aan Cabine, welke?
+    c. HVAC, welke?
+
+2. Aanleiding- Korte omschrijving van de aanleiding voor de storing:
+    a. Bestuurder of monteur constateert een probleem en rapporteert deze.
+    b. Het voertuig meld een fout o.b.v.  een detectie regel van de voertuigbesturing.
+    c. Een functioneel beheerder die het betreffende systeem monitort meld storing aan.
+    d. Via automatische notificatie o.b.v. detectie regel op de technische data.
+
+3. Type Storing: Korte omschrijving van het type storing.
+Als er een of meer opslagcodes worden vermeld, vermeld deze dan hier. 
+Indien er sprake is van een storingscode, vermeld deze dan hier in het rapport.
+
+4. Gedetailleerde Omschrijving: 
+Een gedetailleerde omschrijving van de storing en de context, inclusief relevante omstandigheden die de storing kunnen hebben beïnvloed.
+
+5. Ondernomen Acties:
+Stap-voor-stap wat er gedaan is om de storing te verhelpen, inclusief gebruikte onderdelen, gereedschappen, en eventuele software-updates.
+
+6. Verbruikte Materialen:
+Indien aan de orde, het vermelden van de verbruikte materialen of uitgewisselde onderdelen.
+
+7. Resultaat:
+Beschrijving van de status van de tram na de ondernomen acties, inclusief of de storing volledig is opgelost.
+
+8. Aanbevelingen voor Toekomstige Preventie:
+Eventuele aanbevelingen of observaties om soortgelijke storingen in de toekomst te voorkomen.
+
+9. Opmerkingen:
+Eventuele aanvullende opmerkingen die relevant kunnen zijn voor de storingswerkorder of voor toekomstige referentie.
+
+Om onderstaande tekst te zetten in een goede werklogbeschrijving, doe het volgende:
+Doorloop elk van de negen bovenstaande stappen en zoek in de tekst informatie die overeenkomt met wat de stap beschrijft.
+Vul deze informatie in als opsommingsteken, waarbij je het onderwerp van elk punt behoudt, bijvoorbeeld:
+    1. Specifiek onderdeel van het voertuig waar de storing optrad: Deur 3.b, Cabine B
+    2. korte beschrijving: De chauffeur meldde dat de deur niet helemaal opengaat, enz.
+Als er voor een van de 9 punten geen informatie wordt gevonden, of als er punten ontbreken die moeten worden ingevuld,
+beschrijf de ontbrekende informatie en vermeld deze tussen **, bijvoorbeeld **het deurnummer ontbreekt**,
+of **de vervangen onderdelen staan niet vermeld**.
+Wanneer je klaar bent met het opnieuw opmaken van de tekst in een rapport volgens de bovenstaande template,
+zorg er dan voor dat er geen informatie is, die in de template aanwezig is, maar niet in de tekst.
+Hier is de tekst die je opnieuw moet opmaken in een rapport:
+{transcript}.
