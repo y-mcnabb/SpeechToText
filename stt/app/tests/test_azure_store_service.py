@@ -3,51 +3,61 @@ from azure.storage.blob import ContainerClient
 from typing import Callable
 import random
 import pytest
+from faker import Faker
 from pytest_mock import MockerFixture
-from app.tests.factories import UserFactory, SessionFactory
-from app.models.session import User, Session
-import json
+from app.tests.factories import UserFactory
+
 
 class TestAzureStoreService:
     async def test_get_file(
-        self, upload_blob: Callable, azure_store_service: AzureStoreService
+        self,
+        faker: Faker,
+        upload_blob: Callable,
+        azure_store_service: AzureStoreService,
     ):
         # Arrange
-        blob_name = "foo"
-        content = "bar"
-        upload_blob(blob_name, bytes(content, "utf-8"))
+        session_id = faker.random_number()
+        blob_name = " ".join(faker.random_letters())
+        content = " ".join(faker.random_letters())
+        path = f"{azure_store_service.user_id}/{session_id}/data/{blob_name}"
+        upload_blob(path, bytes(content, "utf-8"))
 
         # Act
         async with azure_store_service as sut:
-            result = await sut.get_file(blob_name, binary=False)
+            result = await sut.get_file(session_id, blob_name, binary=False)
 
         # Assert
         assert result == content
 
     async def test_get_file_binary(
-        self, upload_blob: Callable, azure_store_service: AzureStoreService
+        self,
+        faker: Faker,
+        upload_blob: Callable,
+        azure_store_service: AzureStoreService,
     ):
         # Arrange
-        blob_name = "foo"
-        content = "bar"
-        upload_blob(blob_name, bytes(content, "utf-8"))
+        session_id = faker.random_number()
+        blob_name = " ".join(faker.random_letters())
+        content = " ".join(faker.random_letters())
+        path = f"{azure_store_service.user_id}/{session_id}/data/{blob_name}"
+        upload_blob(path, bytes(content, "utf-8"))
 
         # Act
         async with azure_store_service as sut:
-            result = await sut.get_file(blob_name, binary=True)
+            result = await sut.get_file(session_id, blob_name, binary=True)
 
         # Assert
         assert result == bytes(content, "utf-8")
 
     async def test_write_blob(
         self,
-        create_container,
+        faker: Faker,
         container_client: ContainerClient,
         azure_store_service: AzureStoreService,
     ):
         # Arrange
-        blob_name = "foo"
-        content = "bar"
+        blob_name = " ".join(faker.random_letters())
+        content = " ".join(faker.random_letters())
         count_before = len(list(container_client.list_blob_names()))
 
         # Act
@@ -64,13 +74,13 @@ class TestAzureStoreService:
 
     async def test_save_audio_file(
         self,
-        create_container,
+        faker: Faker,
         container_client: ContainerClient,
         azure_store_service: AzureStoreService,
     ):
         # Arrange
-        blob_name = "blob_name"
-        session_id = "session_id"
+        blob_name = " ".join(faker.random_letters())
+        session_id = faker.random_number()
 
         # Create random audio
         audio_data = bytes(random.randint(0, 255) for _ in range(20))
@@ -98,29 +108,27 @@ class TestAzureStoreService:
 
     async def test_read_metadata(
         self,
-        create_container,
-        container_client: ContainerClient,
+        upload_blob: Callable,
         azure_store_service: AzureStoreService,
-        mocker: MockerFixture
     ):
 
         # Arrange
         user = UserFactory()
-        session = SessionFactory()
         blob_name = "meta/metadata.json"
-        json_string = f'{{"id_": "{user.id_}", "session": "{session}"}}'
-        mocker.patch.object(azure_store_service, "read_metadata", return_value=json_string)
-        # Act
-        blob_path = azure_store_service._generate_blob_path(
-            user.id_, session._id, "meta/metadata.json"
-        )    
-        result = await azure_store_service._read_blob(azure_store_service, blob_path)
-        print(result)
-        expected = User(**json.loads(json_string))
-        print(expected)
-        # Assert
-        expected == result 
 
+        content = user.model_dump_json()
+        path = f"{user.id_}/{user.session.id_}/{blob_name}"
+
+        upload_blob(path, bytes(content, "utf-8"))
+
+        azure_store_service.user_id = user.id_
+
+        # Act
+        async with azure_store_service as sut:
+            result = await sut.read_metadata(user.session.id_)
+
+        # Assert
+        result == user
 
     @pytest.mark.skip
     async def test_update_metadata(
@@ -132,7 +140,7 @@ class TestAzureStoreService:
     ):
 
         # Arrange
-        json = ''
+        json = ""
         blob_name = "meta/metadata.json"
         session_id = "session_id"
         content = "bar"
@@ -173,6 +181,3 @@ class TestAzureStoreService:
 #         blob_name=blob_path, binary=False
 #     )
 #     return User(**json.loads(user_data_json))
-
-
-

@@ -1,6 +1,7 @@
 from azure.storage.blob import BlobServiceClient, ContainerClient
 import os
 import pytest
+from faker import Faker
 from typing import Callable
 from app.services.azure_store_service import AzureStoreService
 from app.services.prompt_service import PromptService
@@ -51,8 +52,11 @@ def upload_blob(container_client: ContainerClient) -> Callable:
 
 
 @pytest.fixture
-def azure_store_service() -> AzureStoreService:
-    return AzureStoreService(user_id="foo")
+def azure_store_service(faker: Faker) -> AzureStoreService:
+    return AzureStoreService(
+        user_id=faker.random_number(),
+        container_name=os.environ.get("STORAGE_CONTAINER"),
+    )
 
 
 @pytest.fixture
@@ -68,11 +72,18 @@ def transcribe_service(azure_store_service) -> TranscribeService:
 
 
 @pytest.fixture
-def prompt_service() -> PromptService:
-    return PromptService(user_id="foo")
+def prompt_service(faker: Faker) -> PromptService:
+    return PromptService(user_id=faker.random_number())
+
 
 @pytest.fixture
 def stt_service(
-    transcribe_service: TranscribeService, chat_service: ChatService, store_service: AzureStoreService
+    transcribe_service: TranscribeService,
+    chat_service: ChatService,
+    store_service: AzureStoreService,
 ) -> SttService:
-    return SttService(transcribe_service=transcribe_service, chat_service=chat_service, store_service=store_service)
+    return SttService(
+        transcribe_service=transcribe_service,
+        chat_service=chat_service,
+        store_service=store_service,
+    )

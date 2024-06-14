@@ -15,6 +15,7 @@ from app.services.store_service import StoreService
 class AzureStoreService(StoreService):
     def __init__(self, user_id: str, container_name: Optional[str] = None):
         super().__init__(user_id, container_name)
+
     """
     Azure Store Service.
 
@@ -29,10 +30,12 @@ class AzureStoreService(StoreService):
             )
         else:
             self.blob_service_client = BlobServiceClient(
-                account_url="https://htmtcadatadev.blob.core.windows.net/", #os.getenv("AZURE_ACCOUNT_URL"),
+                account_url="https://htmtcadatadev.blob.core.windows.net/",  # os.getenv("AZURE_ACCOUNT_URL"),
                 credential=DefaultAzureCredential(),
             )
-        self.container_client = self.blob_service_client.get_container_client(self.container_name)
+        self.container_client = self.blob_service_client.get_container_client(
+            self.container_name
+        )
         return self
 
     async def __aexit__(self, *args):
@@ -42,11 +45,8 @@ class AzureStoreService(StoreService):
         blob_path = self._generate_blob_path(
             self.user_id, session_id, "meta/metadata.json"
         )
-        user_data_json = await self._read_blob(
-            blob_name=blob_path, binary=False
-        )
+        user_data_json = await self._read_blob(blob_name=blob_path, binary=False)
         return User(**json.loads(user_data_json))
-
 
     async def get_file(self, session_id, file_name: str, binary: bool) -> str | bytes:
         blob_path = self._generate_blob_path(
@@ -61,11 +61,7 @@ class AzureStoreService(StoreService):
         await self._write_blob(blob_path, content, content_type="text/plain")
         return blob_path
 
-    async def save_transcript(
-            self, 
-            session_id: str, 
-            content: str
-    ) -> str:
+    async def save_transcript(self, session_id: str, content: str) -> str:
         blob_path = self._generate_blob_path(
             self.user_id,
             session_id,
@@ -115,7 +111,7 @@ class AzureStoreService(StoreService):
             else:
                 blob = await blob_content.content_as_text()
             return blob
-    
+
         except Exception as e:
             logger.error(f"Error reading blob '{blob_name}': {str(e)}")
             raise

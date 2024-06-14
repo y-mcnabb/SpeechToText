@@ -15,7 +15,6 @@ class StoreService(ABC):
         self.user_id = user_id
         self.container_name = STORAGE_CONTAINER
 
-
         if container_name:
             self.container_name = container_name
 

@@ -1,4 +1,4 @@
-from factory import Factory, Sequence, SubFactory, Faker
+from factory import Factory, SubFactory, Faker
 
 from app.models.session import User, Session, AudioData
 
