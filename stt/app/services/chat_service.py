@@ -34,7 +34,7 @@ class ChatService:
         async with self.store_service as service:
             user = await service.read_metadata(session_id)
             transcript = await service.get_file(
-                user.session.transcript_corrected_file, binary=False
+                user.session.transcript_file, binary=False
             )
 
             system_prompt = await self.prompt_service.get_system_prompt(service)

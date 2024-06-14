@@ -9,16 +9,14 @@ from app.services.stt_service import SttService
 from app.services.azure_store_service import AzureStoreService
 from app.services.transcribe_service import TranscribeService
 import os
+from loguru import logger
 
 router = APIRouter()
 
 
 @router.post("/{user_id}/{session_id}", response_model=User)
 async def transcribe(
-    user_id: str,
     session_id: str,
-    store_service: Annotated[StoreService, Depends(get_azure_store_service)],
-    stt_service: SttService = Depends(get_stt_service),
     transcribe_service: TranscribeService = Depends(get_transcribe_service)
 ):
     user = await transcribe_service.transcribe_audio(session_id)
@@ -29,11 +27,9 @@ async def transcribe(
 async def get_transcript(
     user_id: str,
     session_id: str,
-    #transcribe_service: TranscribeService = Depends(get_transcribe_service), 
-    store_service: Annotated[AzureStoreService, Depends(get_azure_store_service)]
+    transcribe_service: TranscribeService = Depends(get_transcribe_service)
 ):
-    user = await store_service.read_metadata(session_id)
-    return await store_service.get_file(user.session.transcript_file)
+    return await transcribe_service.get_transcript(session_id)
 
 
 @router.get("/allenv")

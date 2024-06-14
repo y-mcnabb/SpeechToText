@@ -39,6 +39,8 @@ class Session(BaseModel):
     status: SessionStatus = SessionStatus.NOTHING
 
     transcript_file: Optional[str] = None
+    transcript_content: Optional[str] = None
+    # TODO: might make sense to add two more fields: initial_report and corrected_report instead of corrected file below
     transcript_corrected_file: Optional[str] = None
 
     output_file: Optional[str] = None

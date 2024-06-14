@@ -10,11 +10,16 @@ from loguru import logger
 
 from app.models.session import User
 from app.services.store_service import StoreService
+from app.constants import STORAGE_CONTAINER
 
 
 class AzureStoreService(StoreService):
-    def __init__(self, user_id: str, container_name: Optional[str] = None):
-        super().__init__(user_id, container_name)
+    def __init__(self, 
+                 user_id: str, 
+                 container_name: Optional[str] = None):
+        super().__init__(
+            user_id, 
+            container_name)
 
     """
     Azure Store Service.
@@ -45,7 +50,8 @@ class AzureStoreService(StoreService):
         blob_path = self._generate_blob_path(
             self.user_id, session_id, "meta/metadata.json"
         )
-        user_data_json = await self._read_blob(blob_name=blob_path, binary=False)
+        user_data_json = await self._read_blob(
+            blob_name=blob_path, binary=False)
         return User(**json.loads(user_data_json))
 
     async def get_file(self, session_id, file_name: str, binary: bool) -> str | bytes:
