@@ -32,7 +32,7 @@ class ChatService:
             transcript=transcript,
             )
 
-        user.session.transcript_content = output
+        user.session.output_content = output
         user.session.output_file = await self.store_service.save_output(
             user.session.id_, output_type, output
         )
