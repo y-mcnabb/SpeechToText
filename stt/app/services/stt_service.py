@@ -23,17 +23,16 @@ class SttService:
         session_id = user.session.id_
 
         try:
-            async with self.store_service as service:
-                file_path = await service.save_audio(
-                    user_id,
-                    session_id,
-                    user.session.audio.name,
-                    "audio/wave",
-                    audio_content,
-                )
-                user.session.audio.file = file_path
-                await service.update_metadata(user)
-                return user
+            file_path = await self.store_service.save_audio(
+                user_id,
+                session_id,
+                user.session.audio.name,
+                "audio/wave",
+                audio_content,
+            )
+            user.session.audio.file = file_path
+            await self.store_service.update_metadata(user)
+            return user
 
         except ValidationError as err:
             raise HTTPException(status_code=422, detail=str(err))
@@ -44,7 +43,7 @@ class SttService:
     async def transcribe(self, user_id: str, session_id: str) -> User:
         return await self.transcribe_service.transcribe_audio(session_id)
 
-    async def output(self, user_id: str, session_id: str, output_type: str) -> any:
+    async def output(self, user_id: str, session_id: str, output_type: str) -> User:
         return await self.chat_service.get_transcript_output(
-            user_id, session_id, output_type
+            session_id, output_type
         )

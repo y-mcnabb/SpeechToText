@@ -9,15 +9,21 @@ from app.services.transcribe_service import TranscribeService
 from app.services.openai_service import OpenAIService
 
 
-def get_prompt_service(user_id) -> PromptService:
-    return PromptService(user_id=user_id)
+async def get_azure_store_service(user_id: str):
+    async with AzureStoreService(user_id) as service:
+        yield service
 
 
-def get_azure_store_service(user_id) -> StoreService:
-    return AzureStoreService(user_id)
+def get_prompt_service(
+        user_id: str, 
+        store_service: StoreService = Depends(get_azure_store_service)
+) -> PromptService:
+    return PromptService(user_id=user_id, store_service=store_service)
+
 
 def get_openai_service() -> OpenAIService:
     return OpenAIService()
+
 
 def get_transcribe_service(
     store_service: StoreService = Depends(get_azure_store_service),
@@ -29,8 +35,11 @@ def get_transcribe_service(
 def get_chat_service(
     store_service: StoreService = Depends(get_azure_store_service),
     prompt_service: PromptService = Depends(get_prompt_service),
+    openai_service: OpenAIService = Depends(get_openai_service),
 ) -> ChatService:
-    return ChatService(store_service=store_service, prompt_service=prompt_service)
+    return ChatService(store_service=store_service, 
+                       prompt_service=prompt_service,
+                       openai_service=openai_service)
 
 
 def get_stt_service(

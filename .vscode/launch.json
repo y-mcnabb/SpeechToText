@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "stt/app/main.py",
             "args": [
-                "--dev"
+                "--dev",
             ]
-            "console": "integratedTerminal",
+            "console": "integratedTerminal"
         }
     ]
 }

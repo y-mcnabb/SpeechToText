@@ -44,6 +44,7 @@ class Session(BaseModel):
     transcript_corrected_file: Optional[str] = None
 
     output_file: Optional[str] = None
+    output_content: Optional[str] = None
 
     def set_transcript_version(self) -> None:
         self.transcript_version = self.get_task_key()

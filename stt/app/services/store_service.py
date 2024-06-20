@@ -31,6 +31,10 @@ class StoreService(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_prompt(self, prompt_type: str) -> str:
+        raise NotImplementedError
+    
+    @abstractmethod
     async def save_audio(
         self,
         session_id: str,

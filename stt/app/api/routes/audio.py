@@ -20,9 +20,7 @@ async def upload_audio(
     store_service: Annotated[StoreService, Depends(get_azure_store_service)],
     audio_file: UploadFile = File(...),
 ) -> User:
-    file_bytes = await audio_file.read()
     session_name = audio_file.filename.split(".")[0]
-    timestamp = datetime.now()
     session = Session(
         audio=AudioData(
             name=f"{session_name}.wav",
@@ -35,15 +33,14 @@ async def upload_audio(
 
     # TODO: content type guards
     try:
-        async with store_service as service:
-            logger.info(f"user_id: {user_id}")
-            audio_in_bytes = await audio_file.read()
-            await service.save_audio(
-                session_id=session.id_,
-                name=f"{session_name}.wav",
-                audio_content=audio_in_bytes,
-            )
-            await service.update_metadata(user)
+        logger.info(f"user_id: {user_id}")
+        audio_in_bytes = await audio_file.read()
+        await store_service.save_audio(
+            session_id=session.id_,
+            name=f"{session_name}.wav",
+            audio_content=audio_in_bytes,
+        )
+        await store_service.update_metadata(user)
     except Exception as ex:
         logger.error("Upload Audio Failed ", ex)
         raise ex

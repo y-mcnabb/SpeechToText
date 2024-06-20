@@ -11,6 +11,7 @@ from loguru import logger
 from app.models.session import User
 from app.services.store_service import StoreService
 from app.constants import STORAGE_CONTAINER
+import io
 
 
 class AzureStoreService(StoreService):
@@ -35,7 +36,7 @@ class AzureStoreService(StoreService):
             )
         else:
             self.blob_service_client = BlobServiceClient(
-                account_url="https://htmtcadatadev.blob.core.windows.net/",  # os.getenv("AZURE_ACCOUNT_URL"),
+                account_url=os.getenv("AZURE_ACCOUNT_URL"),
                 credential=DefaultAzureCredential(),
             )
         self.container_client = self.blob_service_client.get_container_client(
@@ -54,27 +55,41 @@ class AzureStoreService(StoreService):
             blob_name=blob_path, binary=False)
         return User(**json.loads(user_data_json))
 
-    async def get_file(self, session_id, file_name: str, binary: bool) -> str | bytes:
+    async def get_file(self, session_id: str, file_name: str, binary: bool) -> str | bytes:
         blob_path = self._generate_blob_path(
-            self.user_id, session_id, f"data/{file_name}"
-        )
+            user_id=self.user_id, session_id=session_id, sub_path=f"data/{file_name}"
+            )
         return await self._read_blob(blob_path, binary)
 
-    async def save_output(self, session_id: str, output_type: str, content: str) -> str:
+
+    async def get_prompt(self, prompt_file: str) -> str:
+        blob_path = self._generate_prompt_path(prompt_file)
+        return await self._read_blob(blob_path, binary=False)
+
+
+    async def save_output(self, 
+                          session_id: str, 
+                          output_type: str, 
+                          content: str) -> str:
         blob_path = self._generate_blob_path(
-            self.user_id, session_id, f"data/{output_type}.txt"
+            self.user_id,
+            session_id,
+            f"data/{output_type}.txt"
         )
         await self._write_blob(blob_path, content, content_type="text/plain")
         return blob_path
 
-    async def save_transcript(self, session_id: str, content: str) -> str:
+    async def save_transcript(self,
+                              session_id: str, 
+                              content: str) -> str:
         blob_path = self._generate_blob_path(
             self.user_id,
             session_id,
             f"data/transcript_{datetime.now().strftime('%Y%m%d')}.txt",
         )
-        await self._write_blob(blob_path, content, "text/plain")
+        await self._write_blob(blob_path, content, content_type="text/plain")
         return blob_path
+
 
     async def save_audio(
         self,
@@ -88,8 +103,8 @@ class AzureStoreService(StoreService):
         await self._write_blob(
             blob_path, content=audio_content, content_type=content_type
         )
-
         return blob_path
+
 
     async def update_metadata(self, user: User) -> User:
         blob_path = self._generate_blob_path(
@@ -101,7 +116,6 @@ class AzureStoreService(StoreService):
         await self._write_blob(
             blob_name=blob_path, content=content, content_type=content_type
         )
-
         return user
 
     async def _read_blob(self, blob_name: str, binary: bool) -> str | bytes:
@@ -112,11 +126,10 @@ class AzureStoreService(StoreService):
             blob_content = await blob_client.download_blob()
 
             if binary:
-                blob = await blob_content.readall()
-                # Download and return content as bytes for .wav or .json files
+                return await blob_content.readall()
             else:
                 blob = await blob_content.content_as_text()
-            return blob
+                return blob
 
         except Exception as e:
             logger.error(f"Error reading blob '{blob_name}': {str(e)}")
@@ -143,7 +156,11 @@ class AzureStoreService(StoreService):
             raise
 
     def _generate_blob_path(self, user_id: str, session_id: str, sub_path: str):
-        return f"{user_id}/{session_id}/{sub_path}"
+        blob_path = f"{user_id}/{session_id}/{sub_path}"
+        return blob_path
+
+    def _generate_prompt_path(self, prompt_file: str):
+        return f"prompts/{prompt_file}"
 
     async def list_blobs(self, prefix: str = None) -> List[str]:
         return [
