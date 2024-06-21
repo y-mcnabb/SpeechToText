@@ -1,32 +1,34 @@
 import json
 import os
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
+from azure.identity import DefaultAzureCredential
 from azure.storage.blob import ContentSettings
 from azure.storage.blob.aio import BlobServiceClient
-from azure.identity import DefaultAzureCredential
 from loguru import logger
 
+from app.constants import (
+    CONTENT_TYPE_AUDIO,
+    CONTENT_TYPE_TEXT,
+    ENCODING_TEXT,
+    METADATA_BLOB_PATH,
+)
 from app.models.session import User
 from app.services.store_service import StoreService
-from app.constants import STORAGE_CONTAINER
-import io
 
 
 class AzureStoreService(StoreService):
-    def __init__(self, 
-                 user_id: str, 
-                 container_name: Optional[str] = None):
-        super().__init__(
-            user_id, 
-            container_name)
-
-    """
-    Azure Store Service.
+    """Azure storage account implementation of store service.
 
     If not used as a context manager, then the caller is responsible for calling close().
+
+    Args:
+        StoreService (StoreService): Abstract store service
     """
+
+    def __init__(self, user_id: str, container_name: Optional[str] = None):
+        super().__init__(user_id, container_name)
 
     async def __aenter__(self):
         # For unit testing purposes
@@ -45,51 +47,42 @@ class AzureStoreService(StoreService):
         return self
 
     async def __aexit__(self, *args):
-        await self.blob_service_client.close()
+        await self.close()
 
     async def read_metadata(self, session_id: str) -> User:
         blob_path = self._generate_blob_path(
-            self.user_id, session_id, "meta/metadata.json"
+            self.user_id, session_id, METADATA_BLOB_PATH
         )
-        user_data_json = await self._read_blob(
-            blob_name=blob_path, binary=False)
+        user_data_json = await self._read_blob(blob_name=blob_path, binary=False)
         return User(**json.loads(user_data_json))
 
-    async def get_file(self, session_id: str, file_name: str, binary: bool) -> str | bytes:
+    async def get_file(
+        self, session_id: str, file_name: str, binary: bool
+    ) -> str | bytes:
         blob_path = self._generate_blob_path(
             user_id=self.user_id, session_id=session_id, sub_path=f"data/{file_name}"
-            )
+        )
         return await self._read_blob(blob_path, binary)
-
 
     async def get_prompt(self, prompt_file: str) -> str:
         blob_path = self._generate_prompt_path(prompt_file)
         return await self._read_blob(blob_path, binary=False)
 
-
-    async def save_output(self, 
-                          session_id: str, 
-                          output_type: str, 
-                          content: str) -> str:
+    async def save_output(self, session_id: str, output_type: str, content: str) -> str:
         blob_path = self._generate_blob_path(
-            self.user_id,
-            session_id,
-            f"data/{output_type}.txt"
+            self.user_id, session_id, f"data/{output_type}.txt"
         )
-        await self._write_blob(blob_path, content, content_type="text/plain")
+        await self._write_blob(blob_path, content, content_type=CONTENT_TYPE_TEXT)
         return blob_path
 
-    async def save_transcript(self,
-                              session_id: str, 
-                              content: str) -> str:
+    async def save_transcript(self, session_id: str, content: str) -> str:
         blob_path = self._generate_blob_path(
             self.user_id,
             session_id,
             f"data/transcript_{datetime.now().strftime('%Y%m%d')}.txt",
         )
-        await self._write_blob(blob_path, content, content_type="text/plain")
+        await self._write_blob(blob_path, content, content_type=CONTENT_TYPE_TEXT)
         return blob_path
-
 
     async def save_audio(
         self,
@@ -98,20 +91,19 @@ class AzureStoreService(StoreService):
         audio_content: bytes,
     ) -> str:
         blob_path = self._generate_blob_path(self.user_id, session_id, f"data/{name}")
-        content_type = "audio/wav"
+        content_type = CONTENT_TYPE_AUDIO
 
         await self._write_blob(
             blob_path, content=audio_content, content_type=content_type
         )
         return blob_path
 
-
     async def update_metadata(self, user: User) -> User:
         blob_path = self._generate_blob_path(
-            user.id_, user.session.id_, "meta/metadata.json"
+            user.id_, user.session.id_, METADATA_BLOB_PATH
         )
         content = user.model_dump_json()
-        content_type = "text/plain"
+        content_type = CONTENT_TYPE_TEXT
 
         await self._write_blob(
             blob_name=blob_path, content=content, content_type=content_type
@@ -123,14 +115,9 @@ class AzureStoreService(StoreService):
             container=self.container_name, blob=blob_name
         )
         try:
-            blob_content = await blob_client.download_blob()
-
-            if binary:
-                return await blob_content.readall()
-            else:
-                blob = await blob_content.content_as_text()
-                return blob
-
+            encoding = None if binary else ENCODING_TEXT
+            blob_content = await blob_client.download_blob(encoding=encoding)
+            return await blob_content.readall()
         except Exception as e:
             logger.error(f"Error reading blob '{blob_name}': {str(e)}")
             raise

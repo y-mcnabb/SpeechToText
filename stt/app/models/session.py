@@ -1,7 +1,8 @@
-from typing import Dict, Optional
 from enum import Enum
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Dict, Optional
 from uuid import uuid4
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Task(BaseModel):

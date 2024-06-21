@@ -1,8 +1,9 @@
 import argparse
 
 import uvicorn
-from fastapi import FastAPI
 from dotenv import load_dotenv
+from fastapi import FastAPI
+from loguru import logger
 
 from app.api.main import api_router
 
@@ -17,17 +18,21 @@ if __name__ == "__main__":
     parser.add_argument("--local", action="store_true")
     parser.add_argument("--prod", action="store_true")
     args = parser.parse_args()
+    env_loaded_succesfully = False
 
     # TODO: Fix this for PROD
     if args.dev:
-        load_dotenv("stt/.dev.env")
+        env_loaded_succesfully = load_dotenv(".dev.env")
     elif args.local:
-        load_dotenv("stt/.local.env")
+        env_loaded_succesfully = load_dotenv(".local.env")
     elif args.prod:
         raise NotImplementedError("PROD is not implemented yet")
     else:
         raise EnvironmentError("Please specify a valid environment")
-    
+
+    if not env_loaded_succesfully:
+        logger.warning("Unable to load environment variables!")
+
     uvicorn.run(
         "app.main:app",
         host="127.0.0.1",

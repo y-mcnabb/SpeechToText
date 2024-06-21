@@ -1,6 +1,6 @@
-from factory import Factory, SubFactory, Faker
+from factory import Factory, Faker, LazyAttribute, SubFactory
 
-from app.models.session import User, Session, AudioData
+from app.models.session import AudioData, Session, User
 
 
 class AudioDataFactory(Factory):
@@ -18,6 +18,9 @@ class SessionFactory(Factory):
         model = Session
 
     audio = SubFactory(AudioDataFactory)
+    transcript_file = LazyAttribute(
+        lambda p: "{} {}".format(Faker("pystr"), Faker("pystr"))
+    )
 
 
 class UserFactory(Factory):

@@ -1,11 +1,12 @@
 import os
 import subprocess
+from tempfile import NamedTemporaryFile
 from typing import Optional
+
 from loguru import logger
 from pydub import AudioSegment
-from app.utils.file_tools import get_size_mb, suffix_to_filename
 
-from tempfile import NamedTemporaryFile
+from app.utils.file_tools import get_size_mb, suffix_to_filename
 
 
 def convert_to_wav(input_file: str, output_file: Optional[str] = None) -> None:
@@ -19,7 +20,9 @@ def convert_to_wav(input_file: str, output_file: Optional[str] = None) -> None:
         logger.info(f'Successfully converted "{input_file}" to "{output_file}"')
 
     except subprocess.CalledProcessError as err:
-        logger.info(f'Error: {err}, could not convert "{input_file}" to "{output_file}"')  # noqa
+        logger.info(
+            f'Error: {err}, could not convert "{input_file}" to "{output_file}"'
+        )  # noqa
 
 
 def compress_large_audio(input_file: str, output_file: str, target_size_mb=24) -> None:
@@ -61,7 +64,7 @@ def compress_audio_file(data: bytes) -> bytes:
         tmp_files.append(tmp_filename_compressed)
         tmp_filename = tmp_filename_compressed
 
-        with open(tmp_filename,  "rb") as f:
+        with open(tmp_filename, "rb") as f:
             data = f.read()
 
         os.remove(tmp_filename)

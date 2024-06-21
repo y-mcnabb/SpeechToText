@@ -44,6 +44,4 @@ class SttService:
         return await self.transcribe_service.transcribe_audio(session_id)
 
     async def output(self, user_id: str, session_id: str, output_type: str) -> User:
-        return await self.chat_service.get_transcript_output(
-            session_id, output_type
-        )
+        return await self.chat_service.get_transcript_output(session_id, output_type)

@@ -1,8 +1,8 @@
-import os
 import json
+import os
 
-from app.services.store_service import StoreService
 from app.constants import HUMAN_PROMPTS_BLOB_NAME, SYSTEM_PROMPT_BLOB_NAME
+from app.services.store_service import StoreService
 
 
 class PromptService:
@@ -12,9 +12,7 @@ class PromptService:
         self.user_id = user_id
         self.store_service = store_service
 
-    async def get_human_prompts(
-        self, prompt_type: str
-    ) -> str:
+    async def get_human_prompts(self, prompt_type: str) -> str:
         human_prompts = json.loads(
             await self.store_service.get_prompt(HUMAN_PROMPTS_BLOB_NAME)
         )

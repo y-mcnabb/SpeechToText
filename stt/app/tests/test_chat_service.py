@@ -1,9 +1,9 @@
 from pytest_mock import MockerFixture
 
 from app.services.chat_service import ChatService
-from app.services.store_service import StoreService
-from app.services.prompt_service import PromptService
 from app.services.openai_service import OpenAIService
+from app.services.prompt_service import PromptService
+from app.services.store_service import StoreService
 from app.tests.factories import UserFactory
 
 

@@ -1,8 +1,8 @@
+import pytest
+from pytest_mock import MockerFixture
+
 from app.services.azure_store_service import AzureStoreService
 from app.services.prompt_service import PromptService
-
-from pytest_mock import MockerFixture
-import pytest
 
 
 class TestPromptService:
@@ -14,10 +14,10 @@ class TestPromptService:
     ):
         # Arrange
         json = '{"prompt1": "bar", "prompt2": "foo"}'
-        mocker.patch.object(azure_store_service, "get_file", return_value=json)
+        mocker.patch.object(azure_store_service, "get_prompt", return_value=json)
 
         # Act
-        result = await prompt_service.get_human_prompts(azure_store_service, "prompt1")
+        result = await prompt_service.get_human_prompts("prompt1")
 
         # Assert
         assert result == "bar"
@@ -30,12 +30,12 @@ class TestPromptService:
     ):
         # Arrange
         json = '{"prompt1": "bar", "prompt2": "foo"}'
-        mocker.patch.object(azure_store_service, "get_file", return_value=json)
+        mocker.patch.object(azure_store_service, "get_prompt", return_value=json)
 
         # Act
         # Assert
         with pytest.raises(KeyError):
-            await prompt_service.get_human_prompts(azure_store_service, "prompt3")
+            await prompt_service.get_human_prompts("prompt3")
 
     async def test_get_system_prompt(
         self,
@@ -45,10 +45,10 @@ class TestPromptService:
     ):
         # Arrange
         json = '{"prompt1": "bar", "prompt2": "foo"}'
-        mocker.patch.object(azure_store_service, "get_file", return_value=json)
+        mocker.patch.object(azure_store_service, "get_prompt", return_value=json)
 
         # Act
-        result = await prompt_service.get_system_prompt(azure_store_service)
+        result = await prompt_service.get_system_prompt()
 
         # Assert
         assert result == json

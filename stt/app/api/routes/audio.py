@@ -1,12 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, File, UploadFile, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from loguru import logger
 
 from app.api.dependencies import get_azure_store_service
-from app.models.session import Session, User, AudioData
+from app.models.session import AudioData, Session, User
 from app.services.store_service import StoreService
-from datetime import datetime
 
 router = APIRouter()
 

@@ -1,8 +1,7 @@
-import os
-from typing import Optional
 from abc import ABC, abstractmethod
-from app.constants import STORAGE_CONTAINER
+from typing import Optional
 
+from app.constants import STORAGE_CONTAINER
 from app.models.session import User
 
 
@@ -33,7 +32,7 @@ class StoreService(ABC):
     @abstractmethod
     async def get_prompt(self, prompt_type: str) -> str:
         raise NotImplementedError
-    
+
     @abstractmethod
     async def save_audio(
         self,

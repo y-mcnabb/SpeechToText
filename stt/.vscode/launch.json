@@ -8,7 +8,7 @@
             "name": "Python Debugger: main",
             "type": "debugpy",
             "request": "launch",
-            "program": "stt/app/main.py",
+            "program": "app/main.py",
             "args": [
                 "--dev"
             ]

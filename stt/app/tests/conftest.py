@@ -1,13 +1,16 @@
-from azure.storage.blob import BlobServiceClient, ContainerClient
 import os
+from typing import Any, AsyncGenerator, Callable
+
 import pytest
+from azure.storage.blob import BlobServiceClient, ContainerClient
 from faker import Faker
-from typing import Callable
+
 from app.services.azure_store_service import AzureStoreService
-from app.services.prompt_service import PromptService
 from app.services.chat_service import ChatService
-from app.services.transcribe_service import TranscribeService
+from app.services.openai_service import OpenAIService
+from app.services.prompt_service import PromptService
 from app.services.stt_service import SttService
+from app.services.transcribe_service import TranscribeService
 
 
 def pytest_generate_tests():
@@ -52,28 +55,51 @@ def upload_blob(container_client: ContainerClient) -> Callable:
 
 
 @pytest.fixture
-def azure_store_service(faker: Faker) -> AzureStoreService:
-    return AzureStoreService(
+async def azure_store_service(
+    faker: Faker,
+) -> AsyncGenerator[Any, AzureStoreService]:
+    async with AzureStoreService(
         user_id=faker.random_number(),
         container_name=os.environ.get("STORAGE_CONTAINER"),
-    )
+    ) as service:
+        yield service
+
+
+@pytest.fixture
+def openai_service():
+    return OpenAIService()
 
 
 @pytest.fixture
 def chat_service(
-    azure_store_service: AzureStoreService, prompt_service: PromptService
+    azure_store_service: AzureStoreService,
+    prompt_service: PromptService,
+    openai_service: OpenAIService,
 ) -> ChatService:
-    return ChatService(store_service=azure_store_service, prompt_service=prompt_service)
+    return ChatService(
+        store_service=azure_store_service,
+        prompt_service=prompt_service,
+        openai_service=openai_service,
+    )
 
 
 @pytest.fixture
-def transcribe_service(azure_store_service) -> TranscribeService:
-    return TranscribeService(store_service=azure_store_service)
+def transcribe_service(
+    azure_store_service,
+    openai_service: OpenAIService,
+) -> TranscribeService:
+    return TranscribeService(
+        store_service=azure_store_service, openai_service=openai_service
+    )
 
 
 @pytest.fixture
-def prompt_service(faker: Faker) -> PromptService:
-    return PromptService(user_id=faker.random_number())
+def prompt_service(
+    faker: Faker, azure_store_service: AzureStoreService
+) -> PromptService:
+    return PromptService(
+        user_id=faker.random_number(), store_service=azure_store_service
+    )
 
 
 @pytest.fixture
