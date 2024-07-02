@@ -16,9 +16,9 @@ from app.services.transcribe_service import TranscribeService
 def pytest_generate_tests():
     """This function is run once at the very start of a test run."""
     # Set Azurite dev credentials
-    os.environ["AZURE_STORAGE_CONNECTION_STRING"] = (
-        "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
-    )
+    os.environ[
+        "AZURE_STORAGE_CONNECTION_STRING"
+    ] = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
     os.environ["STORAGE_CONTAINER"] = "test-container"
 
 

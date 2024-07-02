@@ -4,12 +4,9 @@ import tempfile
 import streamlit as st
 from dotenv import load_dotenv
 
+from ui.chat import read_text_file, response_repair_report
 from ui.transcribe import transcribe_audio
 from ui.utils import load_css, load_html
-from ui.chat import (
-    response_repair_report,
-    read_text_file,
-)
 
 load_dotenv()
 

@@ -5,7 +5,6 @@ from app.services.store_service import StoreService
 
 
 class ChatService:
-
     def __init__(
         self,
         store_service: StoreService,

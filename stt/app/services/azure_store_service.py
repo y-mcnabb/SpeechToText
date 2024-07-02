@@ -8,12 +8,8 @@ from azure.storage.blob import ContentSettings
 from azure.storage.blob.aio import BlobServiceClient
 from loguru import logger
 
-from app.constants import (
-    CONTENT_TYPE_AUDIO,
-    CONTENT_TYPE_TEXT,
-    ENCODING_TEXT,
-    METADATA_BLOB_PATH,
-)
+from app.constants import (CONTENT_TYPE_AUDIO, CONTENT_TYPE_TEXT,
+                           ENCODING_TEXT, METADATA_BLOB_PATH)
 from app.models.session import User
 from app.services.store_service import StoreService
 

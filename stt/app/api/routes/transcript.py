@@ -25,8 +25,3 @@ async def get_transcript(
     transcribe_service: TranscribeService = Depends(get_transcribe_service),
 ):
     return await transcribe_service.get_transcript(session_id)
-
-
-@router.get("/allenv")
-async def get_allenv():
-    return os.environ.items()

@@ -1,11 +1,10 @@
 import os
 
-from ui.utils import (
-    initialise_azure_openai_chat,
-    read_text_file
-)
 #from langchain.model_laboratory import R import RAG
 import pandas as pd
+
+from ui.utils import initialise_azure_openai_chat, read_text_file
+
 
 def response_identify_language(prompt: str) -> str:
     client = initialise_azure_openai_chat()
